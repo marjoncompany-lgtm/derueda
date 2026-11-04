@@ -7,6 +7,10 @@
   <meta name="description" content="De Rueda Construction, Mariveles, Bataan. Workplace records, attendance and the Android field app. The system does not send money." />
   <meta name="theme-color" content="#07111c" />
   <link rel="icon" href="favicon.svg" />
+  <meta property="og:title" content="De Rueda Construction" />
+  <meta property="og:description" content="Workplace records, attendance and the Android field app. The system does not send money." />
+  <meta property="og:image" content="og.jpg" />
+  <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -18,7 +22,7 @@
   <div class="wrap">
     <div class="bar-row">
       <a class="brand" href="index.html" aria-label="De Rueda Construction">
-        <span class="logo"></span>
+        <img class="logo" src="brand/logo.webp" alt="De Rueda Construction" />
       </a>
       <nav class="desk">
         <a href="index.html">Home</a>
@@ -58,7 +62,7 @@
       <figure class="shot">
         <img class="photo" src="images/site-dusk.jpg" alt="Timber formwork and scaffolding on a low building at dusk, with hills behind" />
         <div class="float">
-          <span class="logo"></span>
+          <img class="logo" src="brand/logo.webp" alt="De Rueda Construction" />
           <p>Employee portal</p>
           <p class="sub">Company ID, attendance, records and messages.</p>
         </div>
@@ -134,13 +138,6 @@
     <p>A public Facebook page is listed as De Rueda Builders & Construction Services. No phone number is published here until the company confirms one.</p>
   </div>
 </footer>
-<script>
-Promise.all(["00","01","02","03"].map(function(n){return fetch("logo/"+n).then(function(r){return r.ok?r.text():""})})).then(function(parts){
-  var t=parts.join("").replace(/\s/g,"");
-  if(!t) return;
-  var u='url("data:image/webp;base64,'+t+'")';
-  document.querySelectorAll(".logo").forEach(function(el){el.style.backgroundImage=u});
-}).catch(function(){});
-</script>
+
 </body>
 </html>
