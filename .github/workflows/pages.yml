@@ -35,6 +35,8 @@ jobs:
           test -s _site/downloads/manifest.json
           test -s _site/field/index.html
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
