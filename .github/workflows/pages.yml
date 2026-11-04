@@ -1,0 +1,37 @@
+name: pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build site
+        run: |
+          rm -rf _site
+          mkdir -p _site/images _site/downloads _site/field
+          cp -a site/. _site/
+          base64 -d media/site-dusk.jpg.b64 > _site/images/site-dusk.jpg
+          base64 -d media/materials.jpg.b64 > _site/images/materials.jpg
+          base64 -d media/og.jpg.b64 > _site/og.jpg
+          base64 -d media/DeRueda.apk.b64 > _site/downloads/DeRueda.apk
+          test -s _site/downloads/DeRueda.apk
+          test -s _site/images/site-dusk.jpg
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
