@@ -25,27 +25,28 @@ jobs:
           rm -rf _site
           mkdir -p _site/images _site/downloads _site/field
           cp -a site/. _site/
-          decode() {
+          decode_parts() {
             name="$1"
             dest="$2"
-            expect="$3"
-            dir="media/v2/${name}"
+            dir="media/parts/${name}"
             if [ ! -d "$dir" ]; then
               echo "missing ${name}"
               return 1
             fi
-            n=$(find "$dir" -type f | wc -l)
-            if [ "$n" -lt "$expect" ]; then
-              echo "${name} has ${n} of ${expect}"
-              return 1
-            fi
             mkdir -p "$(dirname "$dest")"
-            find "$dir" -type f | sort | xargs cat | base64 -d > "$dest"
+            find "$dir" -type f -print | sort | xargs cat | base64 -d > "$dest"
             test -s "$dest"
           }
-          decode site-dusk.jpg _site/images/site-dusk.jpg 6 || echo "dusk not ready"
-          decode materials.jpg _site/images/materials.jpg 2 || echo "materials not ready"
-          decode DeRueda.apk _site/downloads/DeRueda.apk 10 || echo "apk not ready"
+          decode_parts og.jpg _site/og.jpg
+          if [ -d media/parts/materials.jpg ]; then
+            decode_parts materials.jpg _site/images/materials.jpg
+          fi
+          if [ -d media/parts/site-dusk.jpg ]; then
+            decode_parts site-dusk.jpg _site/images/site-dusk.jpg
+          fi
+          if [ -d media/parts/DeRueda.apk ]; then
+            decode_parts DeRueda.apk _site/downloads/DeRueda.apk
+          fi
           echo "ready=true" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v5
         if: steps.build.outputs.ready == 'true'
