@@ -1,2 +1,1 @@
-hello
-u000acheck	au-should-stay-literal
+hello\u000aau-world
