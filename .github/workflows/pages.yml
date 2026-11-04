@@ -38,15 +38,6 @@ jobs:
             test -s "$dest"
           }
           decode_parts og.jpg _site/og.jpg
-          if [ -d media/parts/materials.jpg ]; then
-            decode_parts materials.jpg _site/images/materials.jpg
-          fi
-          if [ -d media/parts/site-dusk.jpg ]; then
-            decode_parts site-dusk.jpg _site/images/site-dusk.jpg
-          fi
-          if [ -d media/parts/DeRueda.apk ]; then
-            decode_parts DeRueda.apk _site/downloads/DeRueda.apk
-          fi
           echo "ready=true" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v5
         if: steps.build.outputs.ready == 'true'
