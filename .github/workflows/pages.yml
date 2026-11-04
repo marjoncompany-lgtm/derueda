@@ -19,19 +19,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build site
+        id: build
         run: |
+          set -euo pipefail
           rm -rf _site
           mkdir -p _site/images _site/downloads _site/field
           cp -a site/. _site/
-          base64 -d media/site-dusk.jpg.b64 > _site/images/site-dusk.jpg
-          base64 -d media/materials.jpg.b64 > _site/images/materials.jpg
-          base64 -d media/og.jpg.b64 > _site/og.jpg
-          base64 -d media/DeRueda.apk.b64 > _site/downloads/DeRueda.apk
-          test -s _site/downloads/DeRueda.apk
+          need() {
+            name="$1"
+            count="$2"
+            if [ -f "media/${name}.b64" ]; then
+              return 0
+            fi
+            dir="media/parts/${name}"
+            if [ ! -d "$dir" ]; then
+              echo "missing ${name}"
+              return 1
+            fi
+            n=$(find "$dir" -type f | wc -l)
+            if [ "$n" -lt "$count" ]; then
+              echo "${name} has ${n} of ${count} parts"
+              return 1
+            fi
+          }
+          if ! need og.jpg 6 || ! need site-dusk.jpg 13 || ! need materials.jpg 13 || ! need DeRueda.apk 8; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Media is still uploading. Skipping deploy."
+            exit 0
+          fi
+          decode() {
+            name="$1"
+            dest="$2"
+            if [ -f "media/${name}.b64" ]; then
+              base64 -d "media/${name}.b64" > "$dest"
+            else
+              cat "media/parts/${name}"/* | base64 -d > "$dest"
+            fi
+          }
+          decode og.jpg _site/og.jpg
+          decode site-dusk.jpg _site/images/site-dusk.jpg
+          decode materials.jpg _site/images/materials.jpg
+          decode DeRueda.apk _site/downloads/DeRueda.apk
+          test -s _site/og.jpg
           test -s _site/images/site-dusk.jpg
+          test -s _site/images/materials.jpg
+          test -s _site/downloads/DeRueda.apk
+          echo "ready=true" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v5
+        if: steps.build.outputs.ready == 'true'
       - uses: actions/upload-pages-artifact@v3
+        if: steps.build.outputs.ready == 'true'
         with:
           path: _site
       - id: deployment
+        if: steps.build.outputs.ready == 'true'
         uses: actions/deploy-pages@v4
