@@ -10,4 +10,4 @@ Published with GitHub Pages from the `site` folder.
 
 Nothing on this site transfers money.
 
-Live site: https://marjoncompany-lgtm.github.io/derueda/
+Live site: https://marjoncompany-lgtm.github.io/
