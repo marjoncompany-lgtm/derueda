@@ -25,45 +25,27 @@ jobs:
           rm -rf _site
           mkdir -p _site/images _site/downloads _site/field
           cp -a site/. _site/
-          need() {
+          decode() {
             name="$1"
-            count="$2"
-            if [ -f "media/${name}.b64" ]; then
-              return 0
-            fi
-            dir="media/parts/${name}"
+            dest="$2"
+            expect="$3"
+            dir="media/v2/${name}"
             if [ ! -d "$dir" ]; then
               echo "missing ${name}"
               return 1
             fi
             n=$(find "$dir" -type f | wc -l)
-            if [ "$n" -lt "$count" ]; then
-              echo "${name} has ${n} of ${count} parts"
+            if [ "$n" -lt "$expect" ]; then
+              echo "${name} has ${n} of ${expect}"
               return 1
             fi
+            mkdir -p "$(dirname "$dest")"
+            find "$dir" -type f | sort | xargs cat | base64 -d > "$dest"
+            test -s "$dest"
           }
-          if ! need og.jpg 6 || ! need site-dusk.jpg 13 || ! need materials.jpg 13 || ! need DeRueda.apk 8; then
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "Media is still uploading. Skipping deploy."
-            exit 0
-          fi
-          decode() {
-            name="$1"
-            dest="$2"
-            if [ -f "media/${name}.b64" ]; then
-              base64 -d "media/${name}.b64" > "$dest"
-            else
-              cat "media/parts/${name}"/* | base64 -d > "$dest"
-            fi
-          }
-          decode og.jpg _site/og.jpg
-          decode site-dusk.jpg _site/images/site-dusk.jpg
-          decode materials.jpg _site/images/materials.jpg
-          decode DeRueda.apk _site/downloads/DeRueda.apk
-          test -s _site/og.jpg
-          test -s _site/images/site-dusk.jpg
-          test -s _site/images/materials.jpg
-          test -s _site/downloads/DeRueda.apk
+          decode site-dusk.jpg _site/images/site-dusk.jpg 6 || echo "dusk not ready"
+          decode materials.jpg _site/images/materials.jpg 2 || echo "materials not ready"
+          decode DeRueda.apk _site/downloads/DeRueda.apk 10 || echo "apk not ready"
           echo "ready=true" >> "$GITHUB_OUTPUT"
       - uses: actions/configure-pages@v5
         if: steps.build.outputs.ready == 'true'
