@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Android install · De Rueda Construction</title>
+  <meta name="description" content="De Rueda Construction, Mariveles, Bataan. Public site, field record book, and Android install." />
+  <link rel="icon" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <div class="bar-row">
+      <a class="brand" href="index.html">
+        <svg viewBox="0 0 32 32" width="36" height="36" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#1c3d32"/><path fill="#f3eee4" d="M6.5 15.2 16 6.2l9.5 9v11.2h-19z"/><path fill="#a6843d" d="M16 6.2 25.5 15.2h-3.1L16 9.2l-6.4 6H6.5z"/><rect x="14.2" y="19.2" width="3.6" height="7.2" fill="#1c3d32"/></svg>
+        <span><strong>De Rueda</strong><span>Construction</span></span>
+      </a>
+      <nav class="desk">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="projects.html">Projects</a>
+        <a href="contact.html">Contact</a>
+        <a href="downloads.html">Downloads</a>
+      </nav>
+      <a class="btn forest" href="field/index.html">Field book</a>
+    </div>
+    <nav class="mobile">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="services.html">Services</a>
+      <a href="projects.html">Projects</a>
+      <a href="contact.html">Contact</a>
+      <a href="downloads.html">Downloads</a>
+      <a href="field/index.html">Field book</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap page">
+  <p class="kicker">Android</p>
+  <h1>Install the field app</h1>
+  <p class="muted">One signed package for ARM phones, both 64-bit and older 32-bit. Opening it always asks Android for permission to install. Allow that, and the install finishes without searching your downloads.</p>
+  <p style="margin-top:22px"><a id="get" class="btn forest" href="downloads/DeRueda.apk" download="DeRueda.apk">Download De Rueda</a></p>
+  <p id="asked" class="note" hidden>Android is asking permission to install this app. Allow installs from this browser. If the phone opened Settings, turn the switch on and come back. This page opens the installer again, and De Rueda installs once you confirm the name.</p>
+  <p id="continuing" class="note" hidden>Permission is saved. The installer should be open now. Confirm De Rueda, tap Install, and Android finishes the rest.</p>
+  <ol class="steps">
+    <li>Tap Download De Rueda. If the phone asks whether the file is safe, allow the download.</li>
+    <li>Open the file. Android asks permission to install from this browser. Allow it.</li>
+    <li>Come back here if Settings opened. The installer starts on its own. Tap Install once.</li>
+  </ol>
+  <p id="desk" class="muted" hidden>This file installs on an Android phone. On a computer, send the download to the phone and open it there.</p>
+  <p class="sha">Release-signed. Certificate SHA-256 f70c0b6ace6349f9e3a091dfa236a49837a7a3235c58ed7a5d6a01ad2beffed4. This is a sideload key, not a Play Store upload key.</p>
+  <div class="panel" style="margin-top:18px">
+    <strong style="color:#1c3d32">ARM phones, 64-bit and 32-bit</strong>
+    <p class="muted">One package for current and older ARM phones. Version 1.1.0 · 2026-11-05 · 50.3 KB</p>
+    <p class="sha">SHA-256 df4e84257dfededcee0061cf953a3edb491205f96a49c3eb6f504fc0b7fecbea</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <p>De Rueda Construction. Mariveles, Bataan. The staff system keeps records. It does not send money.</p>
+    <p>Public listing: #7 Doña Adela Heights, Brgy. Mt. View, Mariveles, Bataan 2105. Confirm the address with the company before a visit.</p>
+    <p>A public Facebook page is listed as De Rueda Builders & Construction Services. No phone number is published here until the company confirms one.</p>
+  </div>
+</footer>
+
+<script>
+const KEY = "drc-apk-permit";
+const HREF = "downloads/DeRueda.apk";
+const android = /Android/i.test(navigator.userAgent);
+if (!android) document.getElementById("desk").hidden = false;
+function read() {
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(KEY) || "null");
+    if (!parsed || (parsed.pass !== 1 && parsed.pass !== 2)) return null;
+    if (Date.now() - parsed.at > 15 * 60 * 1000) { sessionStorage.removeItem(KEY); return null; }
+    return parsed;
+  } catch (e) { return null; }
+}
+function write(permit) {
+  if (!permit) sessionStorage.removeItem(KEY);
+  else sessionStorage.setItem(KEY, JSON.stringify(permit));
+}
+function show(phase) {
+  document.getElementById("asked").hidden = phase !== "asked";
+  document.getElementById("continuing").hidden = phase !== "continuing";
+}
+function resume(permit) {
+  write({ href: HREF, pass: 2, at: Date.now() });
+  show("continuing");
+  location.assign(permit.href);
+}
+const saved = read();
+if (saved && saved.pass === 1) show("asked");
+if (saved && saved.pass === 2) show("continuing");
+if (android && saved && saved.pass === 1 && saved.at < performance.timeOrigin - 500) resume(saved);
+let left = false;
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") { if (read() && read().pass === 1) left = true; return; }
+  if (!left || !android) return;
+  left = false;
+  const current = read();
+  if (current && current.pass === 1) resume(current);
+});
+document.getElementById("get").addEventListener("click", (event) => {
+  if (!android) return;
+  event.preventDefault();
+  write({ href: HREF, pass: 1, at: Date.now() });
+  show("asked");
+  const link = document.createElement("a");
+  link.href = HREF;
+  link.download = "DeRueda.apk";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+});
+</script>
+</body></html>
