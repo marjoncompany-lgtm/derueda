@@ -31,7 +31,9 @@ header.bar { border-bottom: 1px solid var(--night-raise); background: var(--nigh
   display: block;
   width: 168px;
   height: 48px;
-  background: url("[image content will be provided separately]") left center / contain no-repeat;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
 }
 
 nav.desk { display: flex; gap: 16px; }

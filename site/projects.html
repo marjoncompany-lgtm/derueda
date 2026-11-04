@@ -55,4 +55,12 @@
     <p>A public Facebook page is listed as De Rueda Builders & Construction Services. No phone number is published here until the company confirms one.</p>
   </div>
 </footer>
+<script>
+Promise.all(["00","01","02","03"].map(function(n){return fetch("logo/"+n).then(function(r){return r.ok?r.text():""})})).then(function(parts){
+  var t=parts.join("").replace(/\s/g,"");
+  if(!t) return;
+  var u='url("data:image/webp;base64,'+t+'")';
+  document.querySelectorAll(".logo").forEach(function(el){el.style.backgroundImage=u});
+}).catch(function(){});
+</script>
 </body></html>
